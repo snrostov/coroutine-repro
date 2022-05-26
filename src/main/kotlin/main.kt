@@ -12,13 +12,8 @@ val currentCoroutine: ThreadLocal<CurrentThread?> = object : ThreadLocal<Current
 }
 
 @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-class CurrentThread(
-    private val coroutineId: Int,
-    val parentCoroutineId: Int = -1,
-) : CopyableThreadContextElement<Unit>,
+class CurrentThread(private val coroutineId: Int) : CopyableThreadContextElement<Unit>,
     AbstractCoroutineContextElement(Key) {
-
-    companion object Key : CoroutineContext.Key<CurrentThread>
 
     override fun copyForChild(): CopyableThreadContextElement<Unit> =
         CurrentThread(lastId.incrementAndGet())
@@ -34,4 +29,10 @@ class CurrentThread(
     override fun restoreThreadContext(context: CoroutineContext, oldState: Unit) {
         currentCoroutine.set(null)
     }
+
+    override fun toString(): String {
+        return "CurrentThread(coroutineId=$coroutineId)"
+    }
+
+    companion object Key : CoroutineContext.Key<CurrentThread>
 }
